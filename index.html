@@ -1,2 +1,579 @@
-GrôNotes (em breve)
-Atualizado em 25 de junho de 2026.
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grô — um segundo cérebro que cresce com você</title>
+<meta name="description" content="Grô é um ecossistema pessoal de IA: memória, agenda, finanças, e-mail e rotina, tudo em um só lugar. gronotes.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a1410;
+    --bg-1:#0f1d17;
+    --bg-2:#13261d;
+    --line:#1f3a2c;
+    --moss:#2f5743;
+    --leaf:#5fae84;
+    --leaf-soft:#5fae8455;
+    --gold:#d9a857;
+    --gold-soft:#d9a85733;
+    --paper:#eee9dd;
+    --paper-dim:#a8b3ac;
+    --paper-faint:#6e7d75;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg-0);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, #1a3528 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 20%, #16291f 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 50% 100%, #102119 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .grain{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  /* ── nav ───────────────────────────────────────── */
+  nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 28px;
+    backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom, rgba(10,20,16,.85), transparent);
+  }
+  .nav-mark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    color:var(--paper);
+    letter-spacing:.01em;
+  }
+  .nav-mark .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--leaf);
+    box-shadow:0 0 12px 2px var(--leaf-soft);
+  }
+  .nav-domain{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--paper-faint);
+    letter-spacing:.03em;
+  }
+
+  /* ── hero ──────────────────────────────────────── */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-top:90px;
+    position:relative;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--leaf);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    margin-bottom:28px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    opacity:0;
+    animation:fadeUp .8s ease forwards;
+    animation-delay:.1s;
+  }
+  .eyebrow::before{
+    content:"";
+    width:18px;height:1px;
+    background:var(--leaf);
+  }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2.6rem, 7vw, 5.6rem);
+    line-height:1.04;
+    letter-spacing:-.01em;
+    color:var(--paper);
+    max-width:880px;
+    opacity:0;
+    animation:fadeUp .9s ease forwards;
+    animation-delay:.25s;
+  }
+  h1 em{
+    font-style:italic;
+    color:var(--leaf);
+    font-weight:500;
+  }
+
+  .hero-sub{
+    margin-top:28px;
+    font-size:1.18rem;
+    line-height:1.6;
+    color:var(--paper-dim);
+    max-width:560px;
+    font-weight:400;
+    opacity:0;
+    animation:fadeUp .9s ease forwards;
+    animation-delay:.45s;
+  }
+
+  .hero-meta{
+    margin-top:46px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    opacity:0;
+    animation:fadeUp .9s ease forwards;
+    animation-delay:.65s;
+  }
+  .pill{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.76rem;
+    color:var(--gold);
+    border:1px solid var(--gold-soft);
+    background:rgba(217,168,87,.06);
+    padding:8px 16px;
+    border-radius:100px;
+    letter-spacing:.02em;
+  }
+  .hero-meta-sep{
+    color:var(--paper-faint);
+    font-size:.85rem;
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(16px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ── núcleo / signature element ────────────────── */
+  .nucleo-stage{
+    position:absolute;
+    right:-60px;
+    top:50%;
+    transform:translateY(-50%);
+    width:520px;
+    height:520px;
+    z-index:-1;
+    opacity:.9;
+  }
+  @media (max-width: 900px){ .nucleo-stage{ display:none; } }
+
+  .nucleo-stage svg{ width:100%; height:100%; }
+
+  .nucleo-pulse{
+    animation:pulse 4.5s ease-in-out infinite;
+    transform-origin:center;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); opacity:.85;}
+    50%{ transform:scale(1.06); opacity:1;}
+  }
+  .nucleo-branch{
+    stroke-dasharray:4 250;
+    stroke-dashoffset:0;
+    animation:grow 6s ease-in-out infinite;
+  }
+  @keyframes grow{
+    0%{ stroke-dashoffset:250; opacity:0;}
+    20%{ opacity:1;}
+    60%{ stroke-dashoffset:0;}
+    100%{ stroke-dashoffset:0; opacity:1;}
+  }
+
+  .scroll-cue{
+    position:absolute;
+    bottom:40px;
+    left:28px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    color:var(--paper-faint);
+    letter-spacing:.08em;
+  }
+  .scroll-cue::after{
+    content:"";
+    width:1px;height:28px;
+    background:linear-gradient(to bottom, var(--paper-faint), transparent);
+    animation:slide 2s ease-in-out infinite;
+  }
+  @keyframes slide{
+    0%{transform:translateY(-4px); opacity:0;}
+    50%{opacity:1;}
+    100%{transform:translateY(4px); opacity:0;}
+  }
+
+  /* ── seção: o que é ───────────────────────────── */
+  section{
+    padding:140px 0;
+    position:relative;
+  }
+  .section-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--leaf);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:18px;
+  }
+  .section-title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.9rem, 4vw, 2.8rem);
+    line-height:1.15;
+    max-width:680px;
+    color:var(--paper);
+  }
+  .section-lead{
+    margin-top:22px;
+    font-size:1.08rem;
+    line-height:1.7;
+    color:var(--paper-dim);
+    max-width:620px;
+  }
+
+  /* ── módulos ───────────────────────────────────── */
+  .modulos-grid{
+    margin-top:64px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  @media (max-width: 760px){
+    .modulos-grid{ grid-template-columns:1fr; }
+  }
+  .modulo{
+    background:var(--bg-1);
+    padding:34px 30px;
+    transition:background .35s ease;
+    position:relative;
+  }
+  .modulo:hover{
+    background:var(--bg-2);
+  }
+  .modulo-id{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    color:var(--paper-faint);
+    margin-bottom:18px;
+    letter-spacing:.05em;
+  }
+  .modulo h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.28rem;
+    color:var(--paper);
+    margin-bottom:10px;
+  }
+  .modulo p{
+    font-size:.92rem;
+    line-height:1.55;
+    color:var(--paper-dim);
+  }
+
+  /* ── faixa de princípio ───────────────────────── */
+  .principio{
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    background:var(--bg-1);
+  }
+  .principio .wrap{
+    padding:90px 28px;
+    display:grid;
+    grid-template-columns:1fr 1.4fr;
+    gap:48px;
+    align-items:start;
+  }
+  @media (max-width: 760px){
+    .principio .wrap{ grid-template-columns:1fr; gap:28px; }
+  }
+  .principio-quote{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.6rem, 3.2vw, 2.2rem);
+    line-height:1.3;
+    color:var(--leaf);
+  }
+  .principio-body p{
+    color:var(--paper-dim);
+    font-size:1.02rem;
+    line-height:1.75;
+    margin-bottom:18px;
+  }
+  .principio-body strong{
+    color:var(--paper);
+    font-weight:500;
+  }
+
+  /* ── status / em construção ──────────────────── */
+  .status-box{
+    margin-top:64px;
+    border:1px solid var(--line);
+    background:var(--bg-1);
+    border-radius:14px;
+    padding:38px 36px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .status-left{
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .status-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 0 0 var(--gold-soft);
+    animation:ping 2s infinite;
+    flex-shrink:0;
+  }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(217,168,87,.5); }
+    70%{ box-shadow:0 0 0 10px rgba(217,168,87,0); }
+    100%{ box-shadow:0 0 0 0 rgba(217,168,87,0); }
+  }
+  .status-left h4{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:1.05rem;
+    color:var(--paper);
+    margin-bottom:4px;
+  }
+  .status-left span{
+    font-size:.88rem;
+    color:var(--paper-faint);
+  }
+  .status-domain{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.92rem;
+    color:var(--gold);
+    border:1px solid var(--gold-soft);
+    padding:10px 18px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+
+  /* ── footer ───────────────────────────────────── */
+  footer{
+    border-top:1px solid var(--line);
+    padding:50px 0 40px;
+  }
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .footer-mark{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    color:var(--paper-faint);
+    font-size:.95rem;
+  }
+  .footer-meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.75rem;
+    color:var(--paper-faint);
+    letter-spacing:.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<nav>
+  <div class="nav-mark"><span class="dot"></span> Grô</div>
+  <div class="nav-domain">gronotes.com</div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">Em preparação</div>
+  <h1>Um segundo cérebro<br>que <em>cresce</em> com você.</h1>
+  <p class="hero-sub">
+    A Grô junta memória, rotina, finanças e e-mail em um único lugar — e conversa
+    com você sobre tudo isso, em português, do jeito que você fala.
+  </p>
+  <div class="hero-meta">
+    <span class="pill">gronotes.com</span>
+    <span class="hero-meta-sep">página de apresentação</span>
+  </div>
+
+  <div class="nucleo-stage">
+    <svg viewBox="0 0 520 520" fill="none">
+      <circle cx="260" cy="260" r="6" fill="#5fae84" class="nucleo-pulse"/>
+      <circle cx="260" cy="260" r="34" stroke="#2f5743" stroke-width="1"/>
+      <circle cx="260" cy="260" r="34" stroke="#5fae84" stroke-width="1" class="nucleo-pulse" opacity="0.5"/>
+
+      <!-- ramos -->
+      <path d="M260 260 C 230 200, 200 150, 150 110" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch"/>
+      <circle cx="150" cy="110" r="4" fill="#d9a857"/>
+
+      <path d="M260 260 C 320 210, 370 180, 430 150" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch" style="animation-delay:.4s"/>
+      <circle cx="430" cy="150" r="4" fill="#5fae84"/>
+
+      <path d="M260 260 C 200 290, 150 320, 90 360" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch" style="animation-delay:.8s"/>
+      <circle cx="90" cy="360" r="4" fill="#5fae84"/>
+
+      <path d="M260 260 C 310 310, 350 350, 400 410" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch" style="animation-delay:1.2s"/>
+      <circle cx="400" cy="410" r="4" fill="#d9a857"/>
+
+      <path d="M260 260 C 240 320, 230 380, 220 450" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch" style="animation-delay:1.6s"/>
+      <circle cx="220" cy="450" r="4" fill="#5fae84"/>
+
+      <path d="M260 260 C 190 230, 130 220, 70 220" stroke="#5fae84" stroke-width="1.3" class="nucleo-branch" style="animation-delay:2s"/>
+      <circle cx="70" cy="220" r="4" fill="#5fae84"/>
+    </svg>
+  </div>
+
+  <div class="scroll-cue">role para conhecer</div>
+</header>
+
+<section class="wrap" id="visao">
+  <div class="section-tag">A visão</div>
+  <h2 class="section-title">Não é mais um assistente. É um lugar onde sua vida digital se organiza sozinha.</h2>
+  <p class="section-lead">
+    A Grô nasceu para resolver um problema simples: informação importante demais
+    espalhada em lugares demais. Anotações, e-mails, compromissos, contas, refeições —
+    cada coisa em um app diferente, exigindo que você seja o elo entre todos eles.
+    A Grô assume esse papel.
+  </p>
+
+  <div class="modulos-grid">
+    <div class="modulo">
+      <div class="modulo-id">01 · memória</div>
+      <h3>Segundo cérebro</h3>
+      <p>Anotações simples ou protegidas por senha, sempre à mão, consultadas automaticamente antes de cada resposta.</p>
+    </div>
+    <div class="modulo">
+      <div class="modulo-id">02 · comunicação</div>
+      <h3>E-mail integrado</h3>
+      <p>Busca, leitura e rascunhos de e-mail direto na conversa — sem trocar de aba, sem perder o fio.</p>
+    </div>
+    <div class="modulo">
+      <div class="modulo-id">03 · rotina</div>
+      <h3>Agenda e lembretes</h3>
+      <p>Compromissos recorrentes, lembretes automáticos e avisos no momento certo, inclusive pelo Telegram.</p>
+    </div>
+    <div class="modulo">
+      <div class="modulo-id">04 · saúde</div>
+      <h3>Plano alimentar</h3>
+      <p>Acompanhamento de refeições e macros, com check rápido e lembretes antes de cada horário.</p>
+    </div>
+    <div class="modulo">
+      <div class="modulo-id">05 · dinheiro</div>
+      <h3>Controle financeiro</h3>
+      <p>Saldo, contas a vencer e despesas, consultados em linguagem natural — sem planilha.</p>
+    </div>
+    <div class="modulo">
+      <div class="modulo-id">06 · expressão</div>
+      <h3>Blog e documentos</h3>
+      <p>Editor de posts e geração de PDFs com identidade visual própria, prontos para compartilhar.</p>
+    </div>
+  </div>
+</section>
+
+<div class="principio">
+  <div class="wrap">
+    <div class="principio-quote">
+      "A Grô deveria parecer menos um software e mais um hábito."
+    </div>
+    <div class="principio-body">
+      <p>
+        Foi essa frase que guiou cada decisão. Em vez de um painel cheio de configurações,
+        a Grô conversa. Em vez de pedir que você se adapte a ela, ela aprende sua rotina
+        e se adapta a você.
+      </p>
+      <p>
+        <strong>Sem nuvem de terceiros guardando o que é seu.</strong> Cada anotação,
+        cada e-mail, cada número financeiro fica em um sistema pessoal — pensado para
+        uma pessoa, não para milhões.
+      </p>
+    </div>
+  </div>
+</div>
+
+<section class="wrap" id="status">
+  <div class="section-tag">Estado atual</div>
+  <h2 class="section-title">Esta é uma página de apresentação. O projeto já existe — o site, ainda está nascendo.</h2>
+  <p class="section-lead">
+    gronotes.com foi reservado para ser a casa oficial da Grô. Enquanto a versão completa
+    é construída, esta página marca o início: o que a Grô é hoje e a direção para onde ela vai.
+  </p>
+
+  <div class="status-box">
+    <div class="status-left">
+      <span class="status-dot"></span>
+      <div>
+        <h4>Em desenvolvimento ativo</h4>
+        <span>Novas atualizações chegam diretamente aqui</span>
+      </div>
+    </div>
+    <div class="status-domain">gronotes.com</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-mark">grô — um broto de cada vez</div>
+    <div class="footer-meta">gronotes.com · 2026</div>
+  </div>
+</footer>
+
+</body>
+</html>
