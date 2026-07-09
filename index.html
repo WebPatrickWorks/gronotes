@@ -431,6 +431,77 @@
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; }
   }
+
+  /* ── rádio player ─────────────────────────────── */
+  .radio-player{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 20px 14px 14px;
+    background:rgba(15,29,23,.85);
+    backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    border-radius:100px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  .radio-play-btn{
+    width:42px;height:42px;
+    flex-shrink:0;
+    border-radius:50%;
+    border:1px solid var(--leaf-soft);
+    background:var(--moss);
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .2s ease, transform .15s ease;
+  }
+  .radio-play-btn:hover{ background:var(--leaf); transform:scale(1.05); }
+  .radio-play-btn svg{ width:16px; height:16px; }
+  .radio-info{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    line-height:1.2;
+  }
+  .radio-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:.86rem;
+    font-weight:500;
+    color:var(--paper);
+  }
+  .radio-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.7rem;
+    color:var(--paper-faint);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .radio-live-dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--paper-faint);
+    flex-shrink:0;
+  }
+  .radio-player.is-playing .radio-live-dot{
+    background:var(--gold);
+    box-shadow:0 0 8px 1px var(--gold-soft);
+    animation:ping 2s infinite;
+  }
+  @media (max-width: 560px){
+    .radio-player{
+      right:14px; left:14px;
+      bottom:14px;
+      padding:12px 16px 12px 12px;
+    }
+    .radio-info{ flex:1; }
+  }
 </style>
 </head>
 <body>
@@ -574,6 +645,64 @@
     <div class="footer-meta">gronotes.com · 2026</div>
   </div>
 </footer>
+
+<div class="radio-player" id="radioPlayer">
+  <button class="radio-play-btn" id="radioPlayBtn" aria-label="Ouvir Grô Rádio">
+    <svg id="radioIconPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="radioIconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <div class="radio-info">
+    <div class="radio-name">Grô Rádio</div>
+    <div class="radio-status"><span class="radio-live-dot"></span><span id="radioStatusText">toque para ouvir</span></div>
+  </div>
+  <audio id="radioAudio" preload="none" src="https://uk5freenew.listen2myradio.com/live.mp3?typeportmount=s1_28774_stream_602781731"></audio>
+</div>
+
+<script>
+(function(){
+  const player = document.getElementById('radioPlayer');
+  const audio = document.getElementById('radioAudio');
+  const btn = document.getElementById('radioPlayBtn');
+  const iconPlay = document.getElementById('radioIconPlay');
+  const iconPause = document.getElementById('radioIconPause');
+  const statusText = document.getElementById('radioStatusText');
+
+  let isPlaying = false;
+
+  function setPlayingUI(playing){
+    isPlaying = playing;
+    player.classList.toggle('is-playing', playing);
+    iconPlay.style.display = playing ? 'none' : 'block';
+    iconPause.style.display = playing ? 'block' : 'none';
+    statusText.textContent = playing ? 'ao vivo' : 'toque para ouvir';
+  }
+
+  btn.addEventListener('click', function(){
+    if (!isPlaying){
+      statusText.textContent = 'conectando…';
+      audio.play().then(function(){
+        setPlayingUI(true);
+      }).catch(function(){
+        statusText.textContent = 'não foi possível conectar';
+      });
+    } else {
+      audio.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  audio.addEventListener('waiting', function(){
+    if (isPlaying) statusText.textContent = 'carregando…';
+  });
+  audio.addEventListener('playing', function(){
+    if (isPlaying) statusText.textContent = 'ao vivo';
+  });
+  audio.addEventListener('error', function(){
+    statusText.textContent = 'sinal indisponível';
+    setPlayingUI(false);
+  });
+})();
+</script>
 
 </body>
 </html>
