@@ -655,7 +655,7 @@
     <div class="radio-name">Grô Rádio</div>
     <div class="radio-status"><span class="radio-live-dot"></span><span id="radioStatusText">toque para ouvir</span></div>
   </div>
-  <audio id="radioAudio" preload="none" src="https://uk5freenew.listen2myradio.com/live.mp3?typeportmount=s1_28774_stream_602781731"></audio>
+  <audio id="radioAudio" preload="none"></audio>
 </div>
 
 <script>
@@ -667,7 +667,17 @@
   const iconPause = document.getElementById('radioIconPause');
   const statusText = document.getElementById('radioStatusText');
 
+  // Ajuste aqui se o caminho do JSON no repositório for outro (deve bater
+  // com o "github_arquivo" configurado em config.html no GroNotes).
+  const LINK_JSON_URL = 'radio_live_link.json';
+
+  // Fallback fixo, só usado se por algum motivo o JSON não puder ser lido
+  // (ex: primeira publicação ainda não aconteceu). Vai expirar como
+  // qualquer link do provedor — o normal é o fetch abaixo sempre substituir.
+  const LINK_FALLBACK = '';
+
   let isPlaying = false;
+  let tentandoReconectar = false;
 
   function setPlayingUI(playing){
     isPlaying = playing;
@@ -677,14 +687,43 @@
     statusText.textContent = playing ? 'ao vivo' : 'toque para ouvir';
   }
 
+  // Busca o link mais recente publicado pelo GroNotes. Usa um parâmetro
+  // "cache-bust" (timestamp) pra evitar que o navegador/CDN do GitHub
+  // Pages sirva uma cópia antiga em cache do JSON.
+  async function buscarLinkAtual(){
+    try {
+      const r = await fetch(`${LINK_JSON_URL}?t=${Date.now()}`, { cache: 'no-store' });
+      if (!r.ok) throw new Error('resposta não-ok: ' + r.status);
+      const d = await r.json();
+      if (d && d.url) return d.url;
+      throw new Error('JSON sem campo "url"');
+    } catch (e) {
+      console.warn('Não foi possível obter o link ao vivo atual:', e);
+      return LINK_FALLBACK || null;
+    }
+  }
+
+  async function conectarEtocar(){
+    statusText.textContent = 'conectando…';
+    const url = await buscarLinkAtual();
+    if (!url){
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      return;
+    }
+    audio.src = url;
+    try {
+      await audio.play();
+      setPlayingUI(true);
+    } catch (e) {
+      statusText.textContent = 'não foi possível conectar';
+      setPlayingUI(false);
+    }
+  }
+
   btn.addEventListener('click', function(){
     if (!isPlaying){
-      statusText.textContent = 'conectando…';
-      audio.play().then(function(){
-        setPlayingUI(true);
-      }).catch(function(){
-        statusText.textContent = 'não foi possível conectar';
-      });
+      conectarEtocar();
     } else {
       audio.pause();
       setPlayingUI(false);
@@ -696,10 +735,37 @@
   });
   audio.addEventListener('playing', function(){
     if (isPlaying) statusText.textContent = 'ao vivo';
+    tentandoReconectar = false;
   });
-  audio.addEventListener('error', function(){
-    statusText.textContent = 'sinal indisponível';
-    setPlayingUI(false);
+
+  // Se o link expirar no meio da audição (o provedor derruba a conexão),
+  // o <audio> dispara "error". Em vez de simplesmente desistir, busca o
+  // link mais recente no JSON e tenta reconectar sozinho — só desiste de
+  // verdade se essa nova tentativa também falhar.
+  audio.addEventListener('error', async function(){
+    if (!isPlaying || tentandoReconectar) {
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      return;
+    }
+    tentandoReconectar = true;
+    statusText.textContent = 'reconectando…';
+    const url = await buscarLinkAtual();
+    if (!url){
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      tentandoReconectar = false;
+      return;
+    }
+    audio.src = url;
+    try {
+      await audio.play();
+      statusText.textContent = 'ao vivo';
+    } catch (e) {
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+    }
+    tentandoReconectar = false;
   });
 })();
 </script>
