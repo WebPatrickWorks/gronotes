@@ -317,6 +317,116 @@
     color:var(--paper-dim);
   }
 
+  .modulo-clicavel{ cursor:pointer; }
+  .modulo-clicavel:focus-visible{
+    outline:1px solid var(--leaf);
+    outline-offset:-1px;
+  }
+  .modulo-saiba-mais{
+    display:inline-block;
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    color:var(--leaf);
+    letter-spacing:.03em;
+    opacity:0;
+    transform:translateX(-4px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .modulo-clicavel:hover .modulo-saiba-mais,
+  .modulo-clicavel:focus-visible .modulo-saiba-mais{
+    opacity:1;
+    transform:translateX(0);
+  }
+
+  /* ── modal: Grô Rádio ──────────────────────────── */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:rgba(6,12,9,.72);
+    backdrop-filter:blur(6px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .modal-overlay.aberto{ display:flex; }
+  .modal-box{
+    position:relative;
+    max-width:480px;
+    width:100%;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:38px 34px;
+    box-shadow:0 30px 80px rgba(0,0,0,.5);
+    animation:modalIn .25s ease forwards;
+  }
+  @keyframes modalIn{
+    from{ opacity:0; transform:translateY(10px) scale(.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .modal-close{
+    position:absolute;
+    top:18px; right:18px;
+    width:30px; height:30px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--paper-faint);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .2s ease, color .2s ease;
+  }
+  .modal-close:hover{ background:var(--bg-2); color:var(--paper); }
+  .modal-close svg{ width:14px; height:14px; }
+  .modal-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    color:var(--leaf);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .modal-box h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.6rem;
+    color:var(--paper);
+    margin-bottom:16px;
+  }
+  .modal-box p{
+    font-size:.98rem;
+    line-height:1.7;
+    color:var(--paper-dim);
+    margin-bottom:14px;
+  }
+  .modal-box .tecnico{
+    font-size:.86rem;
+    color:var(--paper-faint);
+    border-left:2px solid var(--leaf-soft);
+    padding-left:14px;
+    margin:20px 0;
+  }
+  .modal-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:.82rem;
+    color:var(--gold);
+    text-decoration:none;
+    border:1px solid var(--gold-soft);
+    padding:10px 18px;
+    border-radius:100px;
+    transition:background .2s ease;
+  }
+  .modal-link:hover{ background:rgba(217,168,87,.08); }
+
   /* ── faixa de princípio ───────────────────────── */
   .principio{
     border-top:1px solid var(--line);
@@ -641,6 +751,12 @@
       <h3>Blog e documentos</h3>
       <p>Editor de posts e geração de PDFs com identidade visual própria, prontos para compartilhar.</p>
     </div>
+    <div class="modulo modulo-clicavel" id="moduloRadio" role="button" tabindex="0" aria-haspopup="dialog">
+      <div class="modulo-id">07 · trilha sonora</div>
+      <h3>Grô Rádio</h3>
+      <p>Uma transmissão ao vivo, 24 horas por dia, com playlists divididas por gênero — do rock ao house music.</p>
+      <span class="modulo-saiba-mais">saber mais →</span>
+    </div>
   </div>
 </section>
 
@@ -709,6 +825,34 @@
   <audio id="radioAudio" preload="none"></audio>
 </div>
 
+<div class="modal-overlay" id="modalRadio" role="dialog" aria-modal="true" aria-labelledby="modalRadioTitulo">
+  <div class="modal-box">
+    <button class="modal-close" id="modalRadioFechar" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="modal-tag">07 · trilha sonora</div>
+    <h3 id="modalRadioTitulo">Grô Rádio</h3>
+    <p>
+      Não é uma playlist qualquer tocando em loop. A Grô Rádio fica no ar 24 horas por dia,
+      dividida em estações por gênero — rock, blues, house music e outras — pensadas pra
+      acompanhar o momento, não pra competir com ele.
+    </p>
+    <p>
+      Quem toca não é um app de música qualquer: é a própria Grô quem organiza a fila,
+      decide a próxima faixa e mantém o sinal no ar, do mesmo jeito que ela cuida do
+      resto da sua rotina.
+    </p>
+    <div class="tecnico">
+      Nos bastidores é uma transmissão de verdade — protocolo Shoutcast/Icecast, com
+      a Grô usando <code>ffmpeg</code> no lugar de um encoder tradicional. O player aqui
+      embaixo só se conecta nessa transmissão ao vivo, sem middleman.
+    </div>
+    <a class="modal-link" href="radio.html" target="_blank" rel="noopener">
+      Saiba mais sobre a Grô Rádio →
+    </a>
+  </div>
+</div>
+
 <script>
 (function(){
   const player = document.getElementById('radioPlayer');
@@ -747,6 +891,26 @@
 
   volumeSlider.addEventListener('input', function(){
     aplicarVolume(parseInt(this.value, 10));
+  });
+
+  // Modal de apresentação da Grô Rádio (aberto pelo card do módulo 07)
+  const moduloRadio = document.getElementById('moduloRadio');
+  const modalRadio = document.getElementById('modalRadio');
+  const modalRadioFechar = document.getElementById('modalRadioFechar');
+
+  function abrirModalRadio(){ modalRadio.classList.add('aberto'); }
+  function fecharModalRadio(){ modalRadio.classList.remove('aberto'); }
+
+  moduloRadio.addEventListener('click', abrirModalRadio);
+  moduloRadio.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirModalRadio(); }
+  });
+  modalRadioFechar.addEventListener('click', fecharModalRadio);
+  modalRadio.addEventListener('click', function(e){
+    if (e.target === modalRadio) fecharModalRadio();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && modalRadio.classList.contains('aberto')) fecharModalRadio();
   });
 
   // Ajuste aqui se o caminho do JSON no repositório for outro (deve bater

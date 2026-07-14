@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grô Rádio — uma trilha sonora que nunca para</title>
+<meta name="description" content="Grô Rádio: transmissão ao vivo 24 horas, com playlists por gênero, feita pelo mesmo sistema que cuida da sua rotina.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a1410;
+    --bg-1:#0f1d17;
+    --bg-2:#13261d;
+    --line:#1f3a2c;
+    --moss:#2f5743;
+    --leaf:#5fae84;
+    --leaf-soft:#5fae8455;
+    --gold:#d9a857;
+    --gold-soft:#d9a85733;
+    --paper:#eee9dd;
+    --paper-dim:#a8b3ac;
+    --paper-faint:#6e7d75;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-0);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    overflow-x:hidden;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, #1a3528 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 20%, #16291f 0%, transparent 55%),
+      radial-gradient(ellipse 70% 60% at 50% 100%, #102119 0%, transparent 60%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{
+    position:relative;
+    z-index:2;
+    max-width:800px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+  nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:50;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 28px;
+    backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom, rgba(10,20,16,.85), transparent);
+  }
+  .nav-mark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    font-weight:600;
+    color:var(--paper);
+    text-decoration:none;
+  }
+  .nav-mark .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--leaf);
+    box-shadow:0 0 12px 2px var(--leaf-soft);
+  }
+  .nav-voltar{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--paper-faint);
+    text-decoration:none;
+    letter-spacing:.03em;
+    transition:color .2s ease;
+  }
+  .nav-voltar:hover{ color:var(--leaf); }
+
+  .hero{
+    min-height:78vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-top:120px;
+    padding-bottom:60px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--leaf);
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    margin-bottom:24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:18px;height:1px;
+    background:var(--leaf);
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(2.4rem, 6vw, 4.2rem);
+    line-height:1.08;
+    letter-spacing:-.01em;
+    color:var(--paper);
+  }
+  h1 em{ font-style:italic; color:var(--leaf); font-weight:500; }
+  .hero-sub{
+    margin-top:24px;
+    font-size:1.12rem;
+    line-height:1.65;
+    color:var(--paper-dim);
+    max-width:620px;
+  }
+
+  section{ padding:70px 0; border-top:1px solid var(--line); }
+  .section-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.76rem;
+    color:var(--leaf);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:16px;
+  }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.6rem, 3.4vw, 2.2rem);
+    line-height:1.2;
+    color:var(--paper);
+    margin-bottom:20px;
+    max-width:620px;
+  }
+  p{
+    font-size:1.02rem;
+    line-height:1.75;
+    color:var(--paper-dim);
+    margin-bottom:16px;
+    max-width:620px;
+  }
+  strong{ color:var(--paper); font-weight:500; }
+
+  .generos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:26px;
+  }
+  .genero-pill{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.78rem;
+    color:var(--paper-dim);
+    border:1px solid var(--line);
+    background:var(--bg-1);
+    padding:9px 16px;
+    border-radius:100px;
+  }
+
+  .como-funciona-lista{
+    margin-top:8px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .passo{
+    display:flex;
+    gap:18px;
+    align-items:flex-start;
+  }
+  .passo-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.82rem;
+    color:var(--gold);
+    border:1px solid var(--gold-soft);
+    border-radius:50%;
+    width:30px; height:30px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .passo p{ margin-bottom:0; }
+
+  .nota-tecnica{
+    margin-top:36px;
+    font-size:.9rem;
+    color:var(--paper-faint);
+    border-left:2px solid var(--leaf-soft);
+    padding-left:16px;
+    max-width:600px;
+  }
+  .nota-tecnica code{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--leaf);
+    font-size:.85rem;
+  }
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:50px 0 40px;
+  }
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .footer-mark{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    color:var(--paper-faint);
+    font-size:.95rem;
+  }
+  .footer-meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.75rem;
+    color:var(--paper-faint);
+    letter-spacing:.03em;
+  }
+
+  /* ── rádio player (idêntico ao da home) ────────── */
+  .radio-player{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 20px 14px 14px;
+    background:rgba(15,29,23,.85);
+    backdrop-filter:blur(10px);
+    border:1px solid var(--line);
+    border-radius:100px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  .radio-play-btn{
+    width:42px;height:42px;
+    flex-shrink:0;
+    border-radius:50%;
+    border:1px solid var(--leaf-soft);
+    background:var(--moss);
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:background .2s ease, transform .15s ease;
+  }
+  .radio-play-btn:hover{ background:var(--leaf); transform:scale(1.05); }
+  .radio-play-btn svg{ width:16px; height:16px; }
+  .radio-info{ display:flex; flex-direction:column; gap:2px; line-height:1.2; }
+  .radio-name{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:.86rem;
+    font-weight:500;
+    color:var(--paper);
+  }
+  .radio-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.7rem;
+    color:var(--paper-faint);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .radio-live-dot{ width:6px;height:6px;border-radius:50%; background:var(--paper-faint); flex-shrink:0; }
+  .radio-player.is-playing .radio-live-dot{
+    background:var(--gold);
+    box-shadow:0 0 8px 1px var(--gold-soft);
+    animation:ping 2s infinite;
+  }
+  @keyframes ping{
+    0%{ box-shadow:0 0 0 0 rgba(217,168,87,.5); }
+    70%{ box-shadow:0 0 0 10px rgba(217,168,87,0); }
+    100%{ box-shadow:0 0 0 0 rgba(217,168,87,0); }
+  }
+  .radio-volume{ display:flex; align-items:center; gap:8px; padding-left:10px; border-left:1px solid var(--line); }
+  .radio-volume-icon{ width:15px;height:15px; flex-shrink:0; color:var(--paper-faint); }
+  .radio-volume-slider{
+    -webkit-appearance:none; appearance:none;
+    width:70px; height:3px; border-radius:100px;
+    background:var(--line); outline:none; cursor:pointer;
+  }
+  .radio-volume-slider::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:11px;height:11px;border-radius:50%;
+    background:var(--leaf); box-shadow:0 0 6px 1px var(--leaf-soft); cursor:pointer;
+  }
+  .radio-volume-slider::-moz-range-thumb{
+    width:11px;height:11px;border:none;border-radius:50%;
+    background:var(--leaf); box-shadow:0 0 6px 1px var(--leaf-soft); cursor:pointer;
+  }
+  .radio-volume-slider::-moz-range-track{ background:var(--line); height:3px; border-radius:100px; }
+
+  @media (max-width: 560px){
+    .radio-player{ right:14px; left:14px; bottom:14px; padding:12px 16px 12px 12px; }
+    .radio-info{ flex:1; }
+    .radio-volume{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-mark" href="index.html"><span class="dot"></span> Grô</a>
+  <a class="nav-voltar" href="index.html">← voltar para gronotes.com</a>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">07 · trilha sonora</div>
+  <h1>Uma rádio que nunca <em>desliga</em>.</h1>
+  <p class="hero-sub">
+    A Grô Rádio é uma transmissão ao vivo, no ar 24 horas por dia — não uma playlist
+    enlatada tocando em loop. É mais um jeito da Grô estar presente na sua rotina,
+    dessa vez sem precisar de uma pergunta.
+  </p>
+</header>
+
+<section class="wrap">
+  <div class="section-tag">A ideia</div>
+  <h2>Som de fundo pensado, não escolhido no susto.</h2>
+  <p>
+    Toda vez que você abre um app de música, alguém decide por você: um algoritmo,
+    um humor forçado, um anúncio no meio. A Grô Rádio nasceu como o oposto disso —
+    estações organizadas por gênero, escolhidas com calma, prontas pra tocar sem
+    que ninguém precise mexer em nada.
+  </p>
+  <p>
+    Não é rádio pra "descobrir música nova". É rádio pra <strong>acompanhar</strong> —
+    ficar ligada enquanto você trabalha, cozinha ou só quer um som no ambiente,
+    do mesmo jeito que a Grô acompanha o resto da sua rotina.
+  </p>
+  <div class="generos">
+    <span class="genero-pill">Rock</span>
+    <span class="genero-pill">Blues</span>
+    <span class="genero-pill">House Music</span>
+    <span class="genero-pill">Programação padrão</span>
+    <span class="genero-pill">e mais…</span>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-tag">Como funciona</div>
+  <h2>Por trás do play, uma transmissão de verdade.</h2>
+  <div class="como-funciona-lista">
+    <div class="passo">
+      <div class="passo-num">1</div>
+      <p>Cada estação é uma playlist própria, com faixas organizadas manualmente
+      por gênero — a Grô decide a ordem e mantém a fila girando sozinha.</p>
+    </div>
+    <div class="passo">
+      <div class="passo-num">2</div>
+      <p>A transmissão sai ao vivo por um protocolo de streaming de rádio de
+      verdade (Shoutcast/Icecast) — o mesmo tipo usado por rádios online
+      profissionais, não um arquivo de áudio estático.</p>
+    </div>
+    <div class="passo">
+      <div class="passo-num">3</div>
+      <p>O link de escuta desse provedor expira sozinho de tempos em tempos.
+      A Grô cuida disso nos bastidores: percebe quando o link muda e atualiza
+      o player automaticamente, sem que ninguém perceba a troca.</p>
+    </div>
+  </div>
+  <div class="nota-tecnica">
+    Detalhe técnico pra quem curte: no lugar de um encoder tradicional (tipo
+    VirtualDJ), a Grô usa <code>ffmpeg</code> pra falar diretamente com o
+    servidor de streaming. É mais leve, roda em segundo plano, e permite trocar
+    de faixa, pular ou voltar sem interromper o sinal ao vivo.
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-mark">grô — um broto de cada vez</div>
+    <div class="footer-meta">gronotes.com · 2026</div>
+  </div>
+</footer>
+
+<div class="radio-player" id="radioPlayer">
+  <button class="radio-play-btn" id="radioPlayBtn" aria-label="Ouvir Grô Rádio">
+    <svg id="radioIconPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="radioIconPause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <div class="radio-info">
+    <div class="radio-name">Grô Rádio</div>
+    <div class="radio-status"><span class="radio-live-dot"></span><span id="radioStatusText">toque para ouvir</span></div>
+  </div>
+  <div class="radio-volume">
+    <svg class="radio-volume-icon" id="radioVolumeIcon" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+    </svg>
+    <input type="range" class="radio-volume-slider" id="radioVolumeSlider" min="0" max="100" value="80" aria-label="Volume">
+  </div>
+  <audio id="radioAudio" preload="none"></audio>
+</div>
+
+<script>
+(function(){
+  const player = document.getElementById('radioPlayer');
+  const audio = document.getElementById('radioAudio');
+  const btn = document.getElementById('radioPlayBtn');
+  const iconPlay = document.getElementById('radioIconPlay');
+  const iconPause = document.getElementById('radioIconPause');
+  const statusText = document.getElementById('radioStatusText');
+  const volumeSlider = document.getElementById('radioVolumeSlider');
+  const volumeIcon = document.getElementById('radioVolumeIcon');
+
+  const VOLUME_KEY = 'gro_radio_volume';
+  const ICONE_MUDO = 'M16.5 12A4.5 4.5 0 0 0 14 8.03v1.79l2.48 2.48c.01-.1.02-.2.02-.3zm2.5 0c0 .94-.2 1.82-.55 2.63l1.51 1.51A8.796 8.796 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z';
+  const ICONE_BAIXO = 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z';
+  const ICONE_ALTO = 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z';
+
+  function aplicarVolume(pct){
+    const v = Math.min(100, Math.max(0, pct)) / 100;
+    audio.volume = v;
+    volumeSlider.value = pct;
+    volumeIcon.querySelector('path').setAttribute('d', v === 0 ? ICONE_MUDO : (v < 0.5 ? ICONE_BAIXO : ICONE_ALTO));
+    try { localStorage.setItem(VOLUME_KEY, String(pct)); } catch(e) {}
+  }
+
+  const volumeSalvo = (function(){
+    try {
+      const s = localStorage.getItem(VOLUME_KEY);
+      return s !== null ? parseInt(s, 10) : 80;
+    } catch(e) { return 80; }
+  })();
+  aplicarVolume(volumeSalvo);
+
+  volumeSlider.addEventListener('input', function(){
+    aplicarVolume(parseInt(this.value, 10));
+  });
+
+  const LINK_JSON_URL = 'radio_live_link.json';
+  const LINK_FALLBACK = '';
+
+  let isPlaying = false;
+  let tentandoReconectar = false;
+
+  function setPlayingUI(playing){
+    isPlaying = playing;
+    player.classList.toggle('is-playing', playing);
+    iconPlay.style.display = playing ? 'none' : 'block';
+    iconPause.style.display = playing ? 'block' : 'none';
+    statusText.textContent = playing ? 'ao vivo' : 'toque para ouvir';
+  }
+
+  async function buscarLinkAtual(){
+    try {
+      const r = await fetch(`${LINK_JSON_URL}?t=${Date.now()}`, { cache: 'no-store' });
+      if (!r.ok) throw new Error('resposta não-ok: ' + r.status);
+      const d = await r.json();
+      if (d && d.url) return d.url;
+      throw new Error('JSON sem campo "url"');
+    } catch (e) {
+      console.warn('Não foi possível obter o link ao vivo atual:', e);
+      return LINK_FALLBACK || null;
+    }
+  }
+
+  async function conectarEtocar(){
+    statusText.textContent = 'conectando…';
+    const url = await buscarLinkAtual();
+    if (!url){
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      return;
+    }
+    audio.src = url;
+    try {
+      await audio.play();
+      setPlayingUI(true);
+    } catch (e) {
+      statusText.textContent = 'não foi possível conectar';
+      setPlayingUI(false);
+    }
+  }
+
+  btn.addEventListener('click', function(){
+    if (!isPlaying){
+      conectarEtocar();
+    } else {
+      audio.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  audio.addEventListener('waiting', function(){
+    if (isPlaying) statusText.textContent = 'carregando…';
+  });
+  audio.addEventListener('playing', function(){
+    if (isPlaying) statusText.textContent = 'ao vivo';
+    tentandoReconectar = false;
+  });
+
+  audio.addEventListener('error', async function(){
+    if (!isPlaying || tentandoReconectar) {
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      return;
+    }
+    tentandoReconectar = true;
+    statusText.textContent = 'reconectando…';
+    const url = await buscarLinkAtual();
+    if (!url){
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+      tentandoReconectar = false;
+      return;
+    }
+    audio.src = url;
+    try {
+      await audio.play();
+      statusText.textContent = 'ao vivo';
+    } catch (e) {
+      statusText.textContent = 'sinal indisponível';
+      setPlayingUI(false);
+    }
+    tentandoReconectar = false;
+  });
+})();
+</script>
+
+</body>
+</html>
